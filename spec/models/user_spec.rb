@@ -43,4 +43,16 @@ describe User do
     end
   end
 
+  it "should reject users with duplicate email" do
+    User.create!(@attr)
+    user_with_duplicate_email = User.new(@attr)
+    user_with_duplicate_email.should_not be_valid
+  end
+
+  it "should reject user with duplicate email up to case" do
+    email_upcase = @attr[:email].upcase
+    User.create!(@attr.merge(:email => email_upcase))
+    user_with_duplicate_email = User.new(@attr)
+    user_with_duplicate_email.should_not be_valid
+  end
 end
