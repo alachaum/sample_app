@@ -4,7 +4,12 @@ describe User do
   #pending "add some examples to (or delete) #{__FILE__}"
 
   before(:each) do
-    @attr = {:name => "Test User", :email => "test.user@example.com"}
+    @attr = {
+      :name => "Test User", 
+      :email => "test.user@example.com",
+      :password => "foobar",
+      :password_confirmation => "foobar"
+    }
   end
 
   it "should create the user given valid attributes" do
@@ -55,4 +60,75 @@ describe User do
     user_with_duplicate_email = User.new(@attr)
     user_with_duplicate_email.should_not be_valid
   end
+
+  describe "Password validations" do
+    
+    it "should require a password" do
+      user = User.new(@attr.merge(:password => "", :password_confirmation => ""))
+      user.should_not be_valid
+    end
+
+    it "should require a matching password confirmation" do
+      user = User.new(@attr.merge(:password_confirmation => "invalid"))
+      user.should_not be_valid
+    end
+
+    it "should reject short passwords" do
+      short = "a" * 5
+      user = User.new(@attr.merge(:paasword => short, :password_confirmation => short))
+      user.should_not be_valid
+    end
+
+    it "should reject long passwords" do
+      long = "a" * 41
+      user = User.new(@attr.merge(:password => long, :password_confirmation => long))
+      user.should_not be_valid
+    end  
+  end
+
+  describe "Password encryption" do
+
+    before(:each) do
+      @user = User.create!(@attr)
+    end
+
+    it "should have an encrypted password" do
+      @user.should respond_to(:encrypted_password)
+    end
+
+    it "should set the encrypted password" do
+      @user.encrypted_password.should_not be_blank
+    end
+
+    describe "has_password? method" do
+      
+      it "should be true if the password matches" do
+        @user.has_password?(@attr[:password]).should be_true
+      end  
+
+      it "should be false if the password doesn't match" do
+        @user.has_password?("invalid").should be_false
+      end
+
+    end
+    
+    describe "authenticate method" do
+
+      it "should return nil on email/password mismatch" do
+        user_wrong_password = User.authenticate(@attr[:email], "invalid")
+        user_wrong_password.should be_nil
+      end
+
+      it "should return nil if the user doesn't exist" do
+        user_non_existing = User.authenticate("nonexisting@nul.com", @attr[:password])
+        user_non_existing.should be_nil
+      end
+
+      it "should return the user object if on email/password match" do
+        user_valid = User.authenticate(@attr[:email], @attr[:password])
+        user_valid.should == @user
+      end
+    end
+  end
+
 end
