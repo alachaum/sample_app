@@ -185,3 +185,9 @@ td.sidebar {
   border: 1px solid #999;
   margin-bottom: -15px;
 }
+
+/* User Sign Up page */
+div.field, div.actions {
+  margin-bottom: 10px;
+}
+
