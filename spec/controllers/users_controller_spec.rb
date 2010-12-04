@@ -54,6 +54,29 @@ describe UsersController do
         response.should have_selector("a", :href => "/users?page=2",
                                            :content => "Next")
       end
+
+      describe "who are not administrator" do
+        it "should not display the delete link" do
+          get :index
+          response.should_not have_selector("a", :content => "delete")
+        end
+      end
+
+      describe "who are administrator" do
+        before(:each) do
+          @user.toggle!(:admin)
+        end
+
+        it "should display the 'delete' link" do
+          get :index
+          #@user.should be_admin
+          @users[0..2].each do |user|
+            response.should have_selector("a", :content => "delete", 
+                                          :href => user_path(user),
+                                          :'data-method' => "delete")
+          end
+        end
+      end
     end
   end
 
@@ -92,95 +115,128 @@ describe UsersController do
 
 
   describe "GET 'new'" do
-    it "should be successful" do
-      get 'new'
-      response.should be_success
-    end
 
-    it "should have the right title" do
-      get 'new'
-      response.should have_selector('title', :content => "Sign up")
-    end
+    describe "for unsigned users" do
+      it "should be successful" do
+        get 'new'
+        response.should be_success
+      end
 
-    it "should have a name field" do
-      get :new
-      response.should have_selector("input[name='user[name]'][type='text']")
-    end
+      it "should have the right title" do
+        get 'new'
+        response.should have_selector('title', :content => "Sign up")
+      end
+
+      it "should have a name field" do
+        get :new
+        response.should have_selector("input[name='user[name]'][type='text']")
+      end
     
-    it "should have an email field" do
-      get :new
-      response.should have_selector("input[name='user[email]'][type='text']")
+      it "should have an email field" do
+        get :new
+        response.should have_selector("input[name='user[email]'][type='text']")
+      end
+
+      it "should have an password field" do
+        get :new
+        response.should have_selector("input[name='user[password]'][type='password']")
+      end
+
+      it "should have an password_confirmation field" do
+        get :new
+        response.should have_selector("input[name='user[password_confirmation]'][type='password']")
+      end
     end
 
-    it "should have an password field" do
-      get :new
-      response.should have_selector("input[name='user[password]'][type='password']")
-    end
+    describe "for signed-in users" do
+      before(:each) do
+        @user = Factory(:user)
+        test_sign_in(@user)
+      end
 
-    it "should have an password_confirmation field" do
-      get :new
-      response.should have_selector("input[name='user[password_confirmation]'][type='password']")
+      it "should redirect to the root path" do
+        get :new
+        response.should redirect_to(root_path)
+      end
     end
-
   end
 
 
   describe "Post 'create'" do
 
-    describe "failure" do
-    
-      before(:each) do
-        @attr = {:name => "", :email => "", :password => "",
-                 :password_confirmation => ""}
+    describe "for unsigned users" do
+      describe "failure" do
+        before(:each) do
+          @attr = {:name => "", :email => "", :password => "",
+                  :password_confirmation => ""}
+        end
+
+        it "should not create the user" do
+          lambda do
+            post :create, :user => @attr
+          end.should_not change(User, :count)
+        end
+
+        it "should have the right title" do
+          post :create, :user => @attr
+          response.should have_selector("title", :content => "Sign up")
+        end
+
+        it "should redirect to the 'new' page" do
+          post :create, :user => @attr
+          response.should render_template('new')
+        end
       end
 
-      it "should not create the user" do
+      describe "success" do
+      
+        before(:each) do
+          @attr = {:name => "foo", :email => "foo@bar.com", 
+                   :password => "doudou", :password_confirmation => "doudou"}
+        end 
+      
+        it "should create the user" do
+          lambda do
+            post :create, :user => @attr
+          end.should change(User, :count).by(1)
+        end
+
+        it "should redirect to the user show page" do
+          post :create, :user => @attr
+          response.should redirect_to(user_path(assigns(:user)))
+        end 
+    
+        it "should have a welcome message" do
+          post :create, :user => @attr
+          flash[:success].should =~ /welcome to the sample app/i
+        end
+
+        it "should sign the user in" do
+          post :create, :user => @attr
+          controller.should be_signed_in
+        end      
+      end
+    end
+
+    describe "for signed-in users" do
+       before(:each) do
+          @user = Factory(:user)
+          test_sign_in(@user)
+          @attr = {:name => "foo", :email => "foo@bar.com",
+                    :password => "doudou", :password_confirmation => "doudou"}
+       end
+
+       it "should redirect to the root path" do
+         post :create, :user => @attr
+         response.should redirect_to(root_path)
+       end
+
+       it "should not create the user" do
         lambda do
           post :create, :user => @attr
         end.should_not change(User, :count)
       end
-
-      it "should have the right title" do
-        post :create, :user => @attr
-        response.should have_selector("title", :content => "Sign up")
-      end
-
-      it "should redirect to the 'new' page" do
-        post :create, :user => @attr
-        response.should render_template('new')
-      end
     end
-
-    describe "success" do
-      
-      before(:each) do
-        @attr = {:name => "foo", :email => "foo@bar.com", 
-                 :password => "doudou", :password_confirmation => "doudou"}
-      end
-      
-      it "should create the user" do
-        lambda do
-          post :create, :user => @attr
-        end.should change(User, :count).by(1)
-      end
-
-      it "should redirect to the user show page" do
-        post :create, :user => @attr
-        response.should redirect_to(user_path(assigns(:user)))
-      end 
-    
-      it "should have a welcome message" do
-        post :create, :user => @attr
-        flash[:success].should =~ /welcome to the sample app/i
-      end
-
-      it "should sign the user in" do
-        post :create, :user => @attr
-        controller.should be_signed_in
-      end
-              
-    end
-
   end
 
   describe "GET 'edit'" do
@@ -320,14 +376,20 @@ describe UsersController do
 
     describe "as an admin user" do
       before(:each) do
-        admin = Factory(:user, :email => "admin@example.com", :admin => true)
-        test_sign_in(admin)
+        @admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        test_sign_in(@admin)
       end
 
       it "should destroy the user" do
         lambda do
           delete :destroy, :id => @user
         end.should change(User, :count).by(-1)
+      end
+
+      it "should prevent from destroying itself" do
+        lambda do
+          delete :destroy, :id => @admin
+        end.should_not change(User, :count)
       end
 
       it "should redirect to the users page" do
