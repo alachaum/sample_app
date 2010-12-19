@@ -132,6 +132,13 @@ describe UsersController do
       response.should have_selector("a", :href => "#{user_path}?page=2",
                                            :content => "Next")
     end 
+
+    it "should hide the delete link from other users" do
+      other_user = Factory(:user, :email => Factory.next(:email))
+      test_sign_in(other_user)
+      get :show, :id => @user
+      response.should_not have_selector("a", :content => "delete")
+    end
   end
 
 

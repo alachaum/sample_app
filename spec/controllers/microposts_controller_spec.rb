@@ -4,6 +4,12 @@ describe MicropostsController do
   render_views
   
   describe "access control" do
+  
+    it "should deny access to 'index'"do
+      user = Factory(:user)
+      get :index, :user_id => user
+      response.should redirect_to(signin_path)
+    end
 
     it "should deny access to 'create'" do
       post :create
@@ -13,6 +19,43 @@ describe MicropostsController do
     it "should deny access to 'destroy'" do
       delete :destroy, :id => 1
       response.should redirect_to(signin_path)
+    end
+  end
+
+  describe "GET 'user micropost index'" do
+
+    before(:each) do
+      @user = test_sign_in(Factory(:user))
+      @req_user = Factory(:user, :email => Factory.next(:email))
+    end
+
+    it "should be successful" do
+      get :index, :user_id => @req_user
+      response.should be_successful
+    end
+
+    it "should have the right title" do
+      get :index, :user_id => @req_user
+      response.should have_selector("title", :content => @req_user.name)
+    end
+
+    it "should display the requested user's microposts" do
+      mp = Factory(:micropost, :user => @req_user, :content => "Foooo bar")
+      get :index, :user_id => @req_user
+      response.should have_selector("span.content", :content => mp.content)
+    end
+
+    it "should paginate the microposts" do
+      40.times do
+        Factory(:micropost, :user => @req_user, :content => "test content")
+      end
+      get :index, :user_id => @req_user
+      response.should have_selector("div.pagination")
+      response.should have_selector("span.disabled", :content => "Previous")
+      response.should have_selector("a", :href => "#{user_microposts_path(@req_user)}?page=2",
+                                         :content => "2")
+      response.should have_selector("a", :href => "#{user_microposts_path(@req_user)}?page=2",
+                                           :content => "Next")
     end
   end
 
