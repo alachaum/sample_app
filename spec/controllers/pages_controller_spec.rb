@@ -4,6 +4,7 @@ describe PagesController do
   render_views
 
   describe "GET 'home'" do
+
     it "should be successful" do
       get 'home'
       response.should be_success
@@ -14,6 +15,36 @@ describe PagesController do
       response.should have_selector("title",
                                     :content => "Ruby on Rails Tutorial Sample App | Home")
     end  
+
+    describe "when signed in" do
+      
+      before(:each) do
+        @user = test_sign_in(Factory(:user))
+        50.times do |n|
+          Factory(:micropost, :user => @user, :content => "Message #{n}")
+        end
+      end
+
+      it "should contain the micropost form" do
+        get :home
+        response.should have_selector("textarea", :id => "micropost_content")
+      end
+
+      it "should display the proper number of microposts" do
+        get :home
+        response.should have_selector("span", :content => "50 microposts")
+      end
+
+      it "should paginate the microposts" do
+        get :home
+        response.should have_selector("div.pagination")
+        response.should have_selector("span.disabled", :content => "Previous")
+        response.should have_selector("a", :href => "/?page=2",
+                                           :content => "2")
+        response.should have_selector("a", :href => "/?page=2",
+                                           :content => "Next")
+      end 
+    end
   end
 
   describe "GET 'contact'" do

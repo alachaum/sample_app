@@ -3,6 +3,7 @@ require 'spec_helper'
 describe UsersController do
   render_views
 
+
   describe "GET 'index'" do
 
     describe "for non-signed users" do
@@ -119,6 +120,18 @@ describe UsersController do
       response.should have_selector("span.content", :content => mp2.content)
     end
 
+    it "should paginate the microposts" do
+      31.times do
+        Factory(:micropost, :user => @user, :content => "foo bar")
+      end
+      get :show, :id => @user
+      response.should have_selector("div.pagination")
+      response.should have_selector("span.disabled", :content => "Previous")
+      response.should have_selector("a", :href => "#{user_path}?page=2",
+                                         :content => "2")
+      response.should have_selector("a", :href => "#{user_path}?page=2",
+                                           :content => "Next")
+    end 
   end
 
 
