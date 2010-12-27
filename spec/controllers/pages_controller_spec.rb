@@ -23,6 +23,8 @@ describe PagesController do
         50.times do |n|
           Factory(:micropost, :user => @user, :content => "Message #{n}")
         end
+        @other_user = Factory(:user, :email => Factory.next(:email))
+        @other_user.follow!(@user)
       end
 
       it "should contain the micropost form" do
@@ -43,6 +45,14 @@ describe PagesController do
                                            :content => "2")
         response.should have_selector("a", :href => "/?page=2",
                                            :content => "Next")
+      end
+
+      it "should have the right following/followers count" do
+        get :home
+        response.should have_selector("a", :href => following_user_path(@user),
+                                  :content => "0 following")
+        response.should have_selector("a", :href => followers_user_path(@user),
+                                   :content => "1 follower")
       end 
     end
   end
