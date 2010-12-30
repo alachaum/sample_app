@@ -48,4 +48,21 @@ describe Relationship do
       @relationship.should_not be_valid
     end
   end
+
+  describe "dependent :destroy" do
+  
+    before(:each) do
+      @relationship.save
+    end
+
+    it "should destroy the following link" do
+      @followed.destroy
+      Relationship.find_by_id(@relationship.id).should be_nil
+    end
+
+    it "should destroy the followed link" do
+      @follower.destroy
+      Relationship.find_by_id(@relationship.id).should be_nil
+    end
+  end
 end
