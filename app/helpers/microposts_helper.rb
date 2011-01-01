@@ -1,5 +1,17 @@
 module MicropostsHelper
 
+  def reply_from_to_prefix(micropost)
+    recipient = User.find_by_id(micropost.in_reply_to)
+    from = link_to micropost.user.name, micropost.user
+    to = link_to recipient.name, recipient
+    from + " @ " + to
+  end
+
+  def reply_to_prefix(micropost)
+    recipient = User.find_by_id(micropost.in_reply_to)
+    "@ #{recipient.name} "
+  end
+
   def wrap(content)
     raw(content.split.map{ |s| wrap_long_string(s) }.join(' '))
   end

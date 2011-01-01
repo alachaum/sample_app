@@ -1,6 +1,13 @@
 <tr>
   <td class="micropost">
-    <span class="content"><%= wrap(micropost.content) %></span>
+    <% if micropost.reply? %>
+      <span class="reply_prefix">
+        <%= reply_from_to_prefix(micropost) %>
+      </span>
+    <% end %>
+    <span class="content">
+      <%= wrap(micropost.content) %>
+    </span>
     <span class="timestamp">
       Posted <%= time_ago_in_words(micropost.created_at) %> ago.
     </span>
