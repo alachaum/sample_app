@@ -120,6 +120,26 @@ describe UsersController do
       response.should have_selector("span.content", :content => mp2.content)
     end
 
+    it "should show the right number of followers" do
+      10.times do
+        follower = Factory(:user, :email => Factory.next(:email))
+        follower.follow!(@user)
+      end
+      get :show, :id => @user
+      response.should have_selector("a", :href => followers_user_path(@user),
+                                    :content => "10 followers")
+    end
+
+    it "should have the right number of followed people" do
+      10.times do
+        followed = Factory(:user, :email => Factory.next(:email))
+        @user.follow!(followed)
+      end
+      get :show, :id => @user
+      response.should have_selector("a", :href => following_user_path(@user),
+                                    :content => "10 following")
+    end
+
     it "should paginate the microposts" do
       31.times do
         Factory(:micropost, :user => @user, :content => "foo bar")
