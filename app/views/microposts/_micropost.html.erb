@@ -1,8 +1,8 @@
 <tr>
   <td class="micropost">
     <% if micropost.reply? %>
-      <span class="reply_prefix">
-        <%= reply_from_to_prefix(micropost) %>
+      <span class="title">
+        <%= micropost_title(micropost) %>
       </span>
     <% end %>
     <span class="content">

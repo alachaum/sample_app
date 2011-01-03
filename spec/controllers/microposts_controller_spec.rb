@@ -69,9 +69,16 @@ describe MicropostsController do
 
       before(:each) do
         @attr = { :content => "" }
+        @attr_reply = { :content => "blabla", :in_reply_to => 1000 }
       end
 
       it "should not create the micropost" do
+        lambda do
+          post :create, :micropost => @attr
+        end.should_not change(Micropost, :count)
+      end
+
+      it "should not create the reply" do
         lambda do
           post :create, :micropost => @attr
         end.should_not change(Micropost, :count)
@@ -86,7 +93,9 @@ describe MicropostsController do
     describe "success" do
 
       before(:each) do
+        @replied_user = Factory(:user, :email => Factory.next(:email))
         @attr = { :content => "Lorem ipsum" }
+        @attr_reply = { :content => "Lorem ipsum", :in_reply_to => @replied_user.id }
       end
 
       it "should create the micropost" do
@@ -95,12 +104,18 @@ describe MicropostsController do
         end.should change(Micropost, :count).by(1)
       end
 
+      it "should create the reply" do
+        lambda do
+          post :create, :micropost => @attr_reply
+        end.should change(Micropost, :count).by(1)
+      end
+
       it "should redirect to the home page" do
         post :create, :micropost => @attr
         response.should redirect_to(root_path)
       end
 
-      it "should have a flash message" do
+      it "should have a flash message for the micropost" do
         post :create, :micropost => @attr
         flash[:success].should =~ /micropost created/i
       end

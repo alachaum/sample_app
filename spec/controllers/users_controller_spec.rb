@@ -120,17 +120,27 @@ describe UsersController do
       response.should have_selector("span.content", :content => mp2.content)
     end
 
-    it "should show the replies made to the user" do
-      replier = Factory(:user, :name => "The replier", :email => Factory.next(:email))
-      reply = replier.microposts.create!( :content => "Reply", :in_reply_to => @user.id)
-      get :show, :id => @user
-      response.should have_selector("span.reply_prefix", :content => "#{replier.name} @ #{@user.name}")
-      response.should have_selector("span.reply_prefix a", :href => user_path(replier), :content => replier.name)
-      response.should have_selector("span.reply_prefix a", :href => user_path(@user), :content => @user.name)
-      response.should have_selector("span.content", :content => reply.content)
-    end
+    describe "replies" do
 
-    it "should show the signed-in user by 'You' in the replies"
+      before(:each) do
+        @replier = Factory(:user, :name => "The replier", :email => Factory.next(:email))
+        @reply = @replier.microposts.create!( :content => "Reply", :in_reply_to => @user.id)
+      end
+
+      it "should be shown to the user" do
+        get :show, :id => @user
+        response.should have_selector("span.title", :content => "#{@replier.name} @ #{@user.name}")
+        response.should have_selector("span.title a", :href => user_path(@replier), :content => @replier.name)
+        response.should have_selector("span.title a", :href => user_path(@user), :content => @user.name)
+        response.should have_selector("span.content", :content => @reply.content)
+      end
+
+      it "should show the signed-in user as 'You'" do
+        test_sign_in(@user)
+        get :show, :id => @user
+        response.should have_selector("span.title a", :href => user_path(@user), :content => "You")
+      end
+    end
 
     it "should show the right number of followers" do
       10.times do

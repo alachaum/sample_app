@@ -3,8 +3,8 @@
     <%= link_to gravatar_for(feed_item.user), feed_item.user %>
   </td>
   <td class="micropost">
-    <span class="user">
-      <%= link_to feed_item.user.name, feed_item.user %>
+    <span class="title">
+      <%= micropost_title(feed_item) %>
     </span>
     <span class="content"><%= wrap(feed_item.content) %></span>
     <span class="timestamp">

@@ -1,11 +1,16 @@
 module MicropostsHelper
 
-  def reply_from_to_prefix(micropost)
-    recipient = User.find_by_id(micropost.in_reply_to)
-    from = link_to micropost.user.name, micropost.user
-    to = link_to recipient.name, recipient
-    from + " @ " + to
+  def micropost_title(micropost)
+    from = link_to current_user?(micropost.user) ? "You" : micropost.user.name, micropost.user
+    if micropost.reply?
+      recipient = User.find_by_id(micropost.in_reply_to)
+      to = link_to current_user?(recipient) ? "You" : recipient.name, recipient
+      from + " @ " + to
+    else
+      from
+    end
   end
+
 
   def reply_to_prefix(micropost)
     recipient = User.find_by_id(micropost.in_reply_to)

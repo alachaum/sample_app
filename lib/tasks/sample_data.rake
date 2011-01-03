@@ -38,9 +38,10 @@ def make_microposts
 end
 
 def make_replies
-  User.all[2..6].each do |user|
+  User.all[1..6].each do |user|
     user.microposts.create!(:content => Faker::Lorem.sentence(5), :in_reply_to => 1)
   end
+  User.first.microposts.create!(:content => Faker::Lorem.sentence(5), :in_reply_to => 7)
 end
 
 def make_relationships

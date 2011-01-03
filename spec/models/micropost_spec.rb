@@ -118,7 +118,6 @@ describe Micropost do
 
     before(:each) do
       @replier = Factory(:user, :email => Factory.next(:email))
-      
       @user_post = @user.microposts.create!(:content => "foo")
       @replier_post = @replier.microposts.create!(:content => "REPLY", :in_reply_to => @user.id)
     end
@@ -133,6 +132,44 @@ describe Micropost do
 
     it "should include the user's microposts" do
       Micropost.including_replies(@user).should include(@user_post)
+    end
+  end
+
+  describe "feed_for" do
+
+    before(:each) do
+      @followed = Factory(:user, :email => Factory.next(:email))
+      @replier = Factory(:user, :email => Factory.next(:email))
+      @user.follow!(@followed)
+    end
+
+    it "should have a feed_for class method" do
+      Micropost.should respond_to(:feed_for)
+    end
+
+    it "should include the user's microposts" do
+      user_post = @user.microposts.create!(:content => "foo")
+      Micropost.feed_for(@user).should include(user_post)
+    end
+
+    it "should include the followed user's microposts" do
+      followed_post = @followed.microposts.create!(:content => "foo")
+      Micropost.feed_for(@user).should include(followed_post)
+    end
+
+    it "should include the replies made to the user" do
+      replier_post = @replier.microposts.create!(:content => "foo", :in_reply_to => @user.id)
+      Micropost.feed_for(@user).should include(replier_post)
+    end
+
+    it "should include the replies made to the followed user" do
+      replier_post = @replier.microposts.create!(:content => "foo", :in_reply_to => @followed.id)
+      Micropost.feed_for(@user).should include(replier_post)
+    end
+
+    it "should not include the replier's microposts" do
+      replier_simple_post = @replier.microposts.create!(:content => "foo")
+      Micropost.feed_for(@user).should_not include(replier_simple_post)
     end
   end
 end

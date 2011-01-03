@@ -54,6 +54,44 @@ describe PagesController do
         response.should have_selector("a", :href => followers_user_path(@user),
                                    :content => "1 follower")
       end 
+
+      describe "the user feed" do
+
+        before(:each) do
+          @followed = Factory(:user, :email => Factory.next(:email))
+          @replier = Factory(:user, :email => Factory.next(:email))
+          @user.follow!(@followed)
+        end
+
+        it "should display a followed user's micropost properly"  do
+          mp = @followed.microposts.create!(:content => "blabla")
+          get :home
+          response.should have_selector("span.title a", :href => user_path(@followed),
+                                       :content => @followed.name)
+          response.should have_selector("span.content", :content => mp.content)
+        end
+
+        it "should display a reply made to the user properly" do 
+          mp = @replier.microposts.create!(:content => "blabla", :in_reply_to => @user.id)
+          get :home
+          response.should have_selector("span.title a", :href => user_path(@replier),
+                                        :content => @replier.name)
+          response.should have_selector("span.title a", :href => user_path(@user),
+                                        :content => "You")
+          response.should have_selector("span.content", :content => mp.content)
+        end
+
+         it "should display a reply made to a followed user properly" do
+          mp = @replier.microposts.create!(:content => "blabla", :in_reply_to => @followed.id)
+          get :home
+          response.should have_selector("span.title a", :href => user_path(@replier),
+                                        :content => @replier.name)
+          response.should have_selector("span.title a", :href => user_path(@followed),
+                                        :content => @followed.name)
+          response.should have_selector("span.content", :content => mp.content)
+        end
+ 
+      end
     end
   end
 

@@ -176,6 +176,12 @@ describe User do
 
     describe "status feed" do
 
+      before(:each) do
+        @followed = Factory(:user, :email => Factory.next(:email))
+        @replier = Factory(:user, :email => Factory.next(:email))
+        @user.follow!(@followed)
+      end
+
       it "should have a feed" do
         @user.should respond_to(:feed)
       end
@@ -186,16 +192,29 @@ describe User do
       end
 
       it "should not include a different user's micropost" do
-        mp3 = Factory(:micropost, 
+        mp = Factory(:micropost, 
                       :user => Factory(:user, :email => Factory.next(:email)))
-        @user.feed.include?(mp3).should be_false
+        @user.feed.include?(mp).should be_false
       end
 
       it "should include the microposts of followed users" do
-        followed = Factory(:user, :email => Factory.next(:email))
-        mp3 = Factory(:micropost, :user => followed)
-        @user.follow!(followed)
-        @user.feed.should include(mp3)
+        mp = @followed.microposts.create!(:content => "foo")
+        @user.feed.should include(mp)
+      end
+
+      it "should include the replies made to the user" do
+        mp = @replier.microposts.create!(:content => "foo", :in_reply_to => @user.id)
+        @user.feed.should include(mp)
+      end
+
+      it "should include the replies made to the followed user" do
+        mp = @replier.microposts.create!(:content => "foo", :in_reply_to => @followed.id)
+        @user.feed.should include(mp)
+      end
+
+      it "should not include a replier single post" do
+        mp = @replier.microposts.create!(:content => "foo")
+        @user.feed.should_not include(mp)
       end
     end
   end

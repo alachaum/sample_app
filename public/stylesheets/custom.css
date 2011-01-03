@@ -269,7 +269,7 @@ table.microposts tr td.micropost {
   padding-top: 10px;
 }
 
-table.microposts tr td.micropost span.reply_prefix {
+table.microposts tr td.micropost span.title {
   display: block;
   font-size: 85%;
 }
