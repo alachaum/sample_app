@@ -17,6 +17,10 @@
                                      :confirm => "You sure?",
                                      :title => feed_item.content %>
   </td>
+  <% else %>
+  <td> <%= link_to "Reply", "#", :user_id => feed_item.user.id,
+                                :user_name => feed_item.user.name %>
+  </td>
   <% end %>
 </tr>
 
