@@ -91,11 +91,16 @@ describe PagesController do
           response.should have_selector("span.content", :content => mp.content)
         end
 
-        it "should have a reply button for each post coming from another user" do
+        it "should be present for each post coming from another user" do
           mp = @followed.microposts.create!(:content => "blabla")
           get :home
-          response.should have_selector("td a", :href => "#",  :content => "Reply", :user_name => @followed.name,
-                                        :user_id => @followed.id.to_s)
+          response.should have_selector("td a", :href => "#",  
+                                        :class => "reply_button",
+                                        :content => "reply", 
+                                        :user_name => @followed.name,
+                                        :user_id => @followed.id.to_s,
+                                        :link => user_path(@followed)
+                                       )
         end
       end
     end

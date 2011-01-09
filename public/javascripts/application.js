@@ -26,4 +26,12 @@ $(document).ready(function() {
     }
   });
 
+  $(".reply_button").click(function(event){
+    var user_id = $(this).attr("user_id");
+    var user_name = $(this).attr("user_name");
+    var user_link = $(this).attr("link");
+    var user_label = '<a href="' + user_link + '">' + user_name + '</a>';
+    $("#new_micropost").find(".field").find("#reply_user_name").html('@' + user_label);
+    $("#new_micropost").find(".field").find("#micropost_in_reply_to").attr("value", user_id)
+  });
 });

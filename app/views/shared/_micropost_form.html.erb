@@ -2,6 +2,8 @@
   <%= render 'shared/error_messages', :object => f.object %>
   <div id="micropost-counter">140</div>
   <div class="field">
+    <span id="reply_user_name"></span>
+    <%= f.hidden_field :in_reply_to, :value => "" %>
     <%= f.text_area :content %>
   </div>
   <div class="actions">

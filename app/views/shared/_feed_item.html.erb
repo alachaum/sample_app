@@ -18,8 +18,10 @@
                                      :title => feed_item.content %>
   </td>
   <% else %>
-  <td> <%= link_to "Reply", "#", :user_id => feed_item.user.id,
-                                :user_name => feed_item.user.name %>
+    <td> <%= link_to "reply", "#", :class => "reply_button", 
+                                :user_id => feed_item.user.id,
+                                :user_name => feed_item.user.name,
+                                :link => user_path(feed_item.user) %>
   </td>
   <% end %>
 </tr>
