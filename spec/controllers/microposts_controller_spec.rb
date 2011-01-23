@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe MicropostsController do
   render_views
-  
+
   describe "access control" do
-  
+
     it "should deny access to 'index'"do
       user = Factory(:user)
       get :index, :user_id => user
@@ -53,9 +53,9 @@ describe MicropostsController do
       response.should have_selector("div.pagination")
       response.should have_selector("span.disabled", :content => "Previous")
       response.should have_selector("a", :href => "#{user_microposts_path(@req_user)}?page=2",
-                                         :content => "2")
+                                    :content => "2")
       response.should have_selector("a", :href => "#{user_microposts_path(@req_user)}?page=2",
-                                           :content => "Next")
+                                    :content => "Next")
     end
   end
 
@@ -147,7 +147,7 @@ describe MicropostsController do
       end
 
       it "should destroy the micropost" do
-        lambda do 
+        lambda do
           delete :destroy, :id => @micropost
         end.should change(Micropost, :count).by(-1)
       end

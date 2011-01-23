@@ -35,6 +35,12 @@ describe RelationshipsController do
         response.should be_success
       end.should change(Relationship, :count).by(1)
     end
+
+    it "should deliver the signup email" do
+      lambda do
+        post :create, :relationship => { :followed_id => @followed}
+      end.should change(ActionMailer::Base.deliveries, :count).by(1)
+    end
   end
 
   describe "DELETE 'destroy'" do
