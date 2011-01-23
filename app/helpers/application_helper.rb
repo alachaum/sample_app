@@ -15,4 +15,9 @@ module ApplicationHelper
       "#{base_title} | #{@title}"
     end
   end
+  
+  #Encrypt a string in SHA2
+  def secure_hash(string)
+    Digest::SHA2.hexdigest(string)
+  end
 end

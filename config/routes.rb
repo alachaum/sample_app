@@ -1,5 +1,7 @@
 SampleApp::Application.routes.draw do
 
+  resources :password_resets
+
   get "sessions/new"
 
   resources :users do
