@@ -28,6 +28,7 @@ class User < ActiveRecord::Base
                                   :dependent => :destroy
   has_many :followers, :through => :reverse_relationship,
                         :source => :follower
+  has_many :password_resets, :dependent => :destroy
   
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 

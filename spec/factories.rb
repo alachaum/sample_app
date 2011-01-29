@@ -14,3 +14,7 @@ Factory.define :micropost do |micropost|
   micropost.content "Foo bar"
   micropost.association :user
 end
+
+Factory.define :password_reset do |password_reset|
+  password_reset.email
+end

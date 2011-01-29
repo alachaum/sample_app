@@ -1,15 +1,9 @@
-<p id="notice"><%= notice %></p>
+<h1>Password Reset</h1>
 
 <p>
-  <b>Token:</b>
-  <%= @password_reset.token %>
+	An email has been sent to the following address: <b><%= @password_reset.email %></b>
 </p>
 
 <p>
-  <b>User:</b>
-  <%= @password_reset.user_id %>
+	Please click the link inside to reset your password
 </p>
-
-
-<%= link_to 'Edit', edit_password_reset_path(@password_reset) %> |
-<%= link_to 'Back', password_resets_path %>

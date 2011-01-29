@@ -1,0 +1,15 @@
+<%= form_for(@password_reset) do |f| %>
+	<%= render 'shared/error_messages', :object => f.object %>
+	<%= f.hidden_field :token, :value => @password_reset.token %>
+	<div class = "field">
+		<%= label(:user, :password) %><br/>
+		<%= text_field(:user, :password) %>	
+	</div>
+	<div class = "field">
+		<%= label(:user, :password_confirmation) %><br/>
+		<%= text_field(:user, :password_confirmation) %>	
+	</div>
+	<div class = "actions">
+		<%= f.submit "Send", :disable_with => 'Sending...' %>
+	</div>
+<% end %>

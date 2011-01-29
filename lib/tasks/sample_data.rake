@@ -8,6 +8,7 @@ namespace :db do
     make_microposts
     make_replies
     make_relationships
+    make_password_resets
   end
 end
 
@@ -51,4 +52,9 @@ def make_relationships
   followers = users[3..50]
   following.each { |followed| user.follow!(followed) }
   followers.each { |follower| follower.follow!(user) }
+end
+
+def make_password_resets
+  users = User.all[1..10]
+  users.each { |user| PasswordReset.create!({:email => user.email}) }
 end

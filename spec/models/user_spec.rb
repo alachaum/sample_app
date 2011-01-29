@@ -275,4 +275,21 @@ describe User do
       @followed.followers.should include(@user)
     end
   end
+  
+  describe "password reset association" do
+    
+    before(:each) do
+      @user = User.create!(@attr)
+      @password_reset = PasswordReset.create!({:email => @user.email})
+    end
+
+    it "should have a password_resets attribute" do
+      @user.should respond_to(:password_resets)
+    end
+
+    it "should destroy the associated password resets" do
+      @user.destroy
+      PasswordReset.find_by_id(@password_reset.id).should be_nil
+    end
+  end
 end

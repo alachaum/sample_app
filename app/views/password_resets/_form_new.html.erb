@@ -1,0 +1,10 @@
+<%= form_for(@password_reset) do |f| %>
+	<%= render 'shared/error_messages', :object => f.object %>
+	<div class = "field">
+		<%= f.label :email, "Your email" %><br/>
+		<%= f.text_field :email %>		
+	</div>
+	<div class = "actions">
+		<%= f.submit "Reset password", :disable_with => 'Reset passwording...' %>
+	</div>
+<% end %>
